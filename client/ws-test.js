@@ -1,39 +1,28 @@
 var ws = new WebSocket("ws://localhost:8080");
-var KC = {tab:9, enter:13, left:37, up:38, right:39, down:40};
 
-ws.onmessage = function(e){
-    trace(e.data);
-};
-ws.onclose = function(){
-    log("ws closed");
-};
-ws.onopen = function(){
-    log('connected!!');
+ws.onopen = function (e) {
+  var result = document.getElementById('result');
+  result.innerHTML += '<span class="log">onOpen</span><br/>';
 };
 
-$(function(){
-    $('input#post').click(post);
-    $('input#message').keydown(function(e){
-        if(e.keyCode == KC.enter){
-            post();
-        }
-    });
-});
-
-function post(){
-    var name = $('input#name').val();
-    var mes = $('input#message').val();
-    ws.send(name+" : "+mes);
-    $('input#message').val("");    
+ws.onclose = function (e) {
+  var result = document.getElementById('result');
+  result.innerHTML += '<span class="log">onClose</span><br/>';
 };
 
-function log(message){
-    trace("[log] "+message);
+ws.onmessage = function (e) {
+  var result = document.getElementById('result');
+  result.innerHTML += e.data + '<br>';
 };
 
-function trace(message){
-    var mes_div = $('<div />').html(message);
-    $('div#chat').prepend(mes_div);
-};
+post = function () {
+  var mes = document.getElementById('message');
 
+  if (mes.value) {
+    var name = document.getElementById('name');
+    var data = name.value + " : " + mes.value;
+    ws.send(data);
+    mes.value = '';
+  }
+};
 
